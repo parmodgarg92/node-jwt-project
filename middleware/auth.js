@@ -1,17 +1,14 @@
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-const bodyParser = require('body-parser')
+const bodyParser = require("body-parser");
 const config = process.env;
 const express = require("express");
 const app = express();
 
 app.use(cookieParser());
 const verifyToken = (req, res, next) => {
-  console.log(req.cookies, "cookies in middleware");
-
   const token =
     req.body.token || req.query.token || req.headers["x-access-token"];
-  console.log(token);
   if (!token) {
     return res.status(403).send("A token is required for authentication");
   }

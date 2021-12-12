@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("./model/user");
+const Item = require("./model/Item");
 const auth = require("./middleware/auth");
 
 const app = express();
@@ -50,7 +51,7 @@ app.post("/register", async (req, res) => {
     );
     // save user token
     user.token = token;
-    res.cookie('token', token).json({id:user._id,email:user.email});
+    res.cookie("token", token).json({ id: user._id, email: user.email });
   } catch (err) {
     console.log(err);
   }
@@ -80,7 +81,7 @@ app.post("/login", async (req, res) => {
 
       // save user token
       user.token = token;
-      res.cookie('token',token).json(user);
+      res.cookie("token", token).json(user);
     }
     //res.status(400).send("Invalid Credentials");
   } catch (err) {
@@ -88,8 +89,62 @@ app.post("/login", async (req, res) => {
   }
 });
 
+//api for checking user login or not
 app.get("/welcome", auth, (req, res) => {
   res.status(200).send("Welcome 🙌 ");
+});
+
+//api for adding new item in the for login user
+app.post("/items", async (req, res) => {
+  // res.status(200).send("in items post call ");
+  const payload = jwt.verify(
+    req.headers["x-access-token"],
+    process.env.TOKEN_KEY
+  );
+  const item_title = req.body.text;
+  if (!item_title) {
+    res.status(404).json({ error: "missing item title" });
+  }
+
+  // Create item in our database
+  const item = await Item.create({
+    text: item_title,
+    done: false,
+    user: payload.id,
+  });
+  res.status(200).json({ item: item });
+});
+
+//api to get the item list of login users
+app.get("/items", (req, res) => {
+  const payload = jwt.verify(
+    req.headers["x-access-token"],
+    process.env.TOKEN_KEY
+  );
+  Item.where({ user: payload.id }).find((err, items) => {
+    res.json(items);
+  });
+});
+
+app.post("/item-status", (req, res) => {
+  console.log(req.body);
+  const payload = jwt.verify(
+    req.headers["x-access-token"],
+    process.env.TOKEN_KEY
+  );
+  Item.updateOne(
+    {
+      _id: req.body.id,
+      user: payload.id,
+    },
+    {
+      done: req.body.done,
+    }
+  ).then(() => {
+    res
+      .sendStatus(200)
+      .json({ item: `Item with ${req.body.id} status updated` });
+  });
 });
 
 // This should be the last route else any after it won't work

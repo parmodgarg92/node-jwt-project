@@ -19,3 +19,13 @@ Content-Type: application/json
 
 ###
 GET http://localhost:3000/welcome
+
+
+###
+post http://localhost:3000/items
+Content-Type: application/json,
+x-access-token:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjFiNTc2ODc0MTE1ZjM5ZDY1NDhkMGU0IiwiZW1haWwiOiJwYXJtb2RAZ21haWwuY29tIiwiaWF0IjoxNjM5MzI4MDg0LCJleHAiOjE2MzkzMzUyODR9.W2ZTv4HPxkpE2lWYLRisKcjykp_CbY8eJ2Kn9DZt8BA
+
+{
+    "text":"grapes"
+}
